@@ -1,0 +1,277 @@
+<div class="bg-[#262624] h-screen">
+
+    <div class="font-[Google_Sans_Flex] items-center mx-16 font-semibold flex flex-row py-4 text-white border-b border-b-[#40403C]">
+        <p class="text-lg">Student Score Manager</p>
+        <button id="addStudent" class="ms-auto text-sm hover:cursor-pointer font-normal rounded-md bg-[#f0460d] hover:bg-orange-700 p-3">Add Students</button>
+    </div>
+
+    <div id="modal" class="fixed hidden text-white bg-[rgba(0,0,0,0.8)] font-[Google_Sans_Flex] top-0 left-0 flex-row items-center justify-center z-50 w-screen h-screen">
+        <div class="bg-[#262624] rounded-lg p-5">
+            <div class="flex flex-row items-center border-b pb-3 border-b-[#40403C]">
+                <p class="text-md text-[#c2c0b6]">Enter the students details</p>
+                <img id="closeModal" src="./images/delete.png" class="ms-auto h-7 hover:cursor-pointer" alt="">
+            </div>
+            <form action="/students" method="POST" class="flex flex-col gap-4 text-sm mt-4">
+                <div class="flex flex-row">
+                    <div class="flex flex-col gap-2 w-full">
+                        <label for="fullName" class="text-xs text-[#c2c0b6]">Name</label>
+                        <input name="fullName" id="fullName" type="text" class="border rounded-md  w-full h-10 p-2 focus:outline-none border-[#40403C]">
+                    </div>
+
+                </div>
+
+                <div class="gap-4 flex flex-row">
+                    <div class="flex flex-col gap-1">
+                        <label for="grade" class="text-xs text-[#c2c0b6]">Grade (1 -12)</label>
+                        <input name="grade" id="grade" type="number" class="border rounded-md h-10 w-50 p-2  focus:outline-none border-[#40403C]">
+                    </div>
+
+                    <div class="flex flex-col gap-1">
+                        <label for="mathScore" class="text-xs text-[#c2c0b6]">Math Score</label>
+                        <input name="mathScore" id="mathScore" type="number" class="border rounded-md h-10 w-50 p-2  focus:outline-none border-[#40403C]"> 
+                    </div>
+                </div>
+
+                <div class="gap-4 flex flex-row">
+                    <div class="flex flex-col gap-1">
+                        <label for="englishScore" class="text-xs text-[#c2c0b6]">English Score</label>
+                        <input name="englishScore" id="englishScore" type="number" class="border rounded-md h-10 w-50 p-2  focus:outline-none border-[#40403C]">
+                    </div>
+
+                    <div class="flex flex-col gap-1">                   
+                        <label for="scienceScore" class="text-xs text-[#c2c0b6]">Science Score</label>
+                        <input name="scienceScore" id="scienceScore" type="number" class="border rounded-md h-10 w-50 p-2  focus:outline-none border-[#40403C]">
+                    </div>
+                </div>
+
+                <button type="submit" class="bg-orange-600 py-2 rounded-lg mt-2 hover:cursor-pointer hover:bg-orange-700">Add Student</button>
+
+            </form>
+        </div>
+    </div>
+
+    <div id="editModal" class="fixed hidden text-white bg-[rgba(0,0,0,0.8)] font-[Google_Sans_Flex] top-0 left-0 flex-row items-center justify-center z-50 w-screen h-screen">
+        <div class="bg-[#262624] rounded-lg p-5">
+            <div class="flex flex-row items-center border-b pb-3 border-b-[#40403C]">
+                <p class="text-md text-[#c2c0b6]">Edit the student details</p>
+                <img id="closeEditModal" src="./images/delete.png" class="ms-auto h-7 hover:cursor-pointer" alt="">
+            </div>
+            <form action="/students/save_details" method="POST" class="flex flex-col gap-4 text-sm mt-4">
+                <div class="gap-4 flex flex-row">
+                    <div class="flex flex-col gap-2 w-full">
+                        <label for="fullName" class="text-xs text-[#c2c0b6]">Name</label>
+                        <input name="fullName" id="editFullName" type="text" placeholder="Full Name" class="border rounded-md h-10 w-full p-2 focus:outline-none border-[#40403C]">
+                    </div>
+                </div>
+
+                <div class="gap-4 flex flex-row">
+                    <div class="flex flex-col gap-1">
+                        <label for="grade" class="text-xs text-[#c2c0b6]">Grade (1 -12)</label>
+                        <input name="grade" id="editGrade" type="number" placeholder="Grade ( enter 1 - 12 )" class="border rounded-md h-10 w-50 p-2  focus:outline-none border-[#40403C]">
+                    </div>
+
+                    <div class="flex flex-col gap-1">
+                        <label for="mathScore" class="text-xs text-[#c2c0b6]">Math Score</label>
+                        <input name="mathScore" id="editMathScore" type="number" placeholder="Math Score" class="border rounded-md h-10 w-50 p-2  focus:outline-none border-[#40403C]"> 
+                    </div>
+                </div>
+
+                <div class="gap-4 flex flex-row">
+                    <div class="flex flex-col gap-1">
+                        <label for="englishScore" class="text-xs text-[#c2c0b6]">English Score</label>
+                        <input name="englishScore" id="editEnglishScore" type="number" placeholder="English Score" class="border rounded-md h-10 w-50 p-2  focus:outline-none border-[#40403C]">
+                    </div>
+
+                    <div class="flex flex-col gap-1">                   
+                        <label for="scienceScore" class="text-xs text-[#c2c0b6]">Science Score</label>
+                        <input name="scienceScore" id="editScienceScore" type="number" placeholder="Science Score" class="border rounded-md h-10 w-50 p-2  focus:outline-none border-[#40403C]">
+                    </div>
+                </div>
+
+                <input id="real_id" type="hidden" name="real_id">
+                <button id="saveBtn" type="submit" class="bg-orange-600 py-2 rounded-lg mt-2 hover:cursor-pointer text-lg hover:bg-orange-700">Save</button>
+
+            </form>
+        </div>
+    </div>
+
+    <div class="flex flex-row items-center justify-center text-white">
+        <table class="mt-8 border border-[#40403C] font-[Google_Sans_Flex]">
+            <tr class="text-md bg-[#414040]">
+                <th class="p-3 border font-normal border-[#40403C] w-40">Name</th>
+                <th class="p-3 border font-normal border-[#40403C] w-28">Student ID</th>
+                <th class="p-3 border font-normal border-[#40403C] w-36">Grade</th>
+                <th class="p-3 border font-normal border-[#40403C] w-32">Math Score</th>
+                <th class="p-3 border font-normal border-[#40403C] w-36">English Score</th>
+                <th class="p-3 border font-normal border-[#40403C] w-36">Science Score</th>
+                <th class="p-3 border font-normal border-[#40403C] w-36">Total Score</th>
+                <th class="p-3 border font-normal border-[#40403C] w-36">Average Score</th>
+                <th class="p-3 border font-normal border-[#40403C] w-28">Actions</th>
+            </tr>
+            <tr>
+                {{#each students}}
+                    <tr class="text-sm hover:bg-gray-700">
+                        <td class="border border-[#40403C] p-3 h-15"><p class="text-left">{{this.name}}</p></td>
+                        <td class="border border-[#40403C] p-3 h-15"><p class="text-center">{{this.real_id}}</p></td>
+                        <td class="border border-[#40403C] p-3 h-15"><p class="text-center">{{this.class}}</p></td>
+                        <td class="border border-[#40403C] p-3 h-15"><p class="text-right">{{this.math}}</p></td>
+                        <td class="border border-[#40403C] p-3 h-15"><p class="text-right">{{this.english}}</p></td>
+                        <td class="border border-[#40403C] p-3 h-15"><p class="text-right">{{this.science}}</p></td>
+                        <td class="border border-[#40403C] p-3 h-15"><p class="text-right">{{this.total}}</p></td>
+                        <td class="border border-[#40403C] p-3 h-15"><p class="text-right">{{this.average}}</p></td>
+                        <td class="border border-[#40403C] p-3 h-15">
+                            <div class="flex flex-row items-center justify-around">
+                                <button data-id="{{this.id}}" class="editBtn hover:cursor-pointer hover:outline-white hover:outline rounded-2xl">
+                                    <img src="./images/edit.png" class="h-8" alt="">
+                                </button>
+                                <form action="/students/delete" method="post">
+                                    <input type="hidden" name="id" value="{{this.id}}">
+                                    <button type="submit" class="deleteBtn hover:cursor-pointer hover:outline-white hover:outline rounded-2xl">
+                                        <img src="./images/bin.png" class="h-8" alt="">
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                {{/each}}
+            </tr>
+
+        </table>
+    </div>
+</div>
+
+<script>
+    const mathScore = document.getElementById("mathScore");
+    const englishScore = document.getElementById("englishScore");
+    const scienceScore = document.getElementById("scienceScore");
+    const averageScore = document.getElementById("averageScore");
+    const totalScore = document.getElementById("totalScore");
+
+    const max = 100;
+    const min = 0;
+
+    mathScore.addEventListener("blur", () => {
+        if(mathScore.value != ""){
+            if(parseInt(mathScore.value) < min){
+                mathScore.value = min;
+            }
+            if(parseInt(mathScore.value) > max){
+                mathScore.value = max;
+            }
+        }
+    })
+
+    englishScore.addEventListener("blur", () => {
+        if(englishScore.value != ""){
+            if(parseInt(englishScore.value) < min){
+                englishScore.value = min;
+            }
+            if(parseInt(englishScore.value) > max){
+                englishScore.value = max;
+            }
+        }
+    })
+
+    scienceScore.addEventListener("blur", () => {
+        if(scienceScore.value != ""){
+            if(parseInt(scienceScore.value) < min){
+                scienceScore.value = min;
+            }
+            if(parseInt(scienceScore.value) > max){
+                scienceScore.value = max;
+            }
+        }
+    })
+
+    const grade = document.getElementById("grade");
+    const maxGrade = 12;
+    const minGrade = 1;
+
+    grade.addEventListener("blur", () => {
+        if(grade.value != ""){
+            if(parseInt(grade.value) < minGrade){
+                grade.value = minGrade;
+            }
+            if(parseInt(grade.value) > maxGrade){
+                grade.value = maxGrade;
+            }
+        }
+    })
+
+
+    const modal = document.getElementById("modal");
+    const closeModal = document.getElementById("closeModal");
+    const addStudent = document.getElementById("addStudent");
+
+    closeModal.addEventListener("click", () => {
+        modal.classList.remove("flex")
+        modal.classList.add("hidden")
+    })
+
+    addStudent.addEventListener("click", () => {
+        modal.classList.remove("hidden")
+        modal.classList.add("flex")
+    })
+
+    const deleteBtns = document.querySelectorAll(".deleteBtn");
+
+    deleteBtns.forEach(button => {
+        button.addEventListener("click", (event) => {
+            if (!confirm('Are you sure you want to delete that row?')) {
+            event.preventDefault(); // Prevents the link or button from taking action
+        }
+        })
+    });
+
+    const editModal = document.getElementById("editModal");
+    const closeEditModal = document.getElementById("closeEditModal");
+
+    const editFullName = document.getElementById("editFullName");
+    const editGrade = document.getElementById("editGrade");
+    const editMathScore = document.getElementById("editMathScore");
+    const editEnglishScore = document.getElementById("editEnglishScore");
+    const editScienceScore = document.getElementById("editScienceScore");
+    const real_id = document.getElementById("real_id")
+
+    closeEditModal.addEventListener("click", () => {
+        editModal.classList.remove("flex")
+        editModal.classList.add("hidden")
+    })
+
+    const editBtns = document.querySelectorAll(".editBtn");
+    
+    editBtns.forEach(button => {
+        button.addEventListener("click", async() => {
+            const id = button.dataset.id;
+
+            const response = await fetch("/students/edit", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ id: id})
+            })
+
+            const data = await response.json();
+            console.log(data);
+
+            editFullName.value = data['name'];
+            real_id.value = data['id'];
+            editMathScore.value = data['math'];
+            editEnglishScore.value = data['english'];
+            editScienceScore.value = data['science'];
+            editGrade.value = parseInt(data['class'].replace("Grade ", ""));
+
+
+            editModal.classList.remove("hidden");
+            editModal.classList.add("flex");
+        })
+    })
+
+
+    addStudent.addEventListener("click", () => {
+        modal.classList.remove("hidden")
+        modal.classList.add("flex")
+    })
+
+</script>

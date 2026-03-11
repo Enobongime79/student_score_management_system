@@ -1,0 +1,7 @@
+# Ignore dependencies and temporary files
+node_modules/
+.env
+*.log
+*.tmp
+/vendor/
+/dist/

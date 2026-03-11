@@ -1,0 +1,112 @@
+<div class="bg-[#262624] h-screen">
+
+    <div class="font-[Google_Sans_Flex] items-center mx-16 font-semibold flex flex-row py-4 text-white border-b border-b-[#40403C]">
+        <p class="text-lg">Admin Manager</p>
+        <button id="addAdmin" class="ms-auto text-sm hover:cursor-pointer font-normal rounded-md bg-[#f0460d] hover:bg-orange-700 p-3">Add Admin</button>
+    </div>
+
+    <div id="modal" class="fixed hidden text-white bg-[rgba(0,0,0,0.8)] font-[Google_Sans_Flex] top-0 left-0 flex-row items-center justify-center z-50 w-screen h-screen">
+        <div class="bg-[#262624] w-[30vw] rounded-lg p-5">
+            <div class="flex flex-row items-center border-b pb-3 justify-center border-b-[#40403C]">
+                <p class="text-md text-[#c2c0b6]">Enter the admin details</p>
+                <img id="closeModal" src="/images/delete.png" class="ms-auto h-7 hover:cursor-pointer" alt="">
+            </div>
+            <form action="/super_admin/manage_admins/add_admins" method="POST" class="flex flex-col gap-4 text-sm mt-4">
+                <div class="flex flex-row">
+                    <div class="flex flex-col gap-2 w-full">
+                        <label for="fullName" class="text-xs text-[#c2c0b6]">Name</label>
+                        <input name="name" id="name" type="text" class="border rounded-md  w-full h-10 p-2 focus:outline-none border-[#40403C]">
+                    </div>
+
+                </div>
+
+                <div class="flex flex-row">
+                    <div class="flex flex-col gap-2 w-full">
+                        <label for="fullName" class="text-xs text-[#c2c0b6]">Email</label>
+                        <input name="email" id="fullName" type="text" class="border rounded-md  w-full h-10 p-2 focus:outline-none border-[#40403C]">
+                    </div>
+
+                </div>
+                <button type="submit" class="bg-orange-600 py-2 rounded-lg mt-2 hover:cursor-pointer hover:bg-orange-700">Add Admin</button>
+
+            </form>
+        </div>
+    </div>
+
+    <div id="editModal" class="fixed hidden text-white bg-[rgba(0,0,0,0.8)] font-[Google_Sans_Flex] top-0 left-0 flex-row items-center justify-center z-50 w-screen h-screen">
+        <div class="bg-[#262624] rounded-lg p-5">
+            <div class="flex flex-row items-center border-b pb-3 border-b-[#40403C]">
+                <p class="text-md text-[#c2c0b6]">Edit the admins details</p>
+                <img id="closeEditModal" src="/images/delete.png" class="ms-auto h-7 hover:cursor-pointer" alt="">
+            </div>
+            <form action="/students/save_details" method="POST" class="flex flex-col gap-4 text-sm mt-4">
+                <div class="gap-4 flex flex-row">
+                    <div class="flex flex-col gap-2 w-full">
+                        <label for="fullName" class="text-xs text-[#c2c0b6]">Name</label>
+                        <input name="fullName" id="editFullName" type="text" placeholder="Full Name" class="border rounded-md h-10 w-full p-2 focus:outline-none border-[#40403C]">
+                    </div>
+                </div>
+                <div class="gap-4 flex flex-row">
+                    <div class="flex flex-col gap-2 w-full">
+                        <label for="email" class="text-xs text-[#c2c0b6]">Email</label>
+                        <input name="email" id="editEmail" type="text" placeholder="Full Name" class="border rounded-md h-10 w-full p-2 focus:outline-none border-[#40403C]">
+                    </div>
+                </div>
+
+                <input id="real_id" type="hidden" name="real_id">
+                <button id="saveBtn" type="submit" class="bg-orange-600 py-2 rounded-lg mt-2 hover:cursor-pointer text-lg hover:bg-orange-700">Save</button>
+
+            </form>
+        </div>
+    </div>
+
+    <div class="flex flex-row items-center justify-center text-white">
+        <table class="mt-8 border border-[#40403C] font-[Google_Sans_Flex]">
+            <tr class="text-md bg-[#414040]">
+                <th class="p-3 border font-normal border-[#40403C] w-50">Name</th>
+                <th class="p-3 border font-normal border-[#40403C] w-28">Admin ID</th>
+                <th class="p-3 border font-normal border-[#40403C] w-40">Email</th>               
+                <th class="p-3 border font-normal border-[#40403C] w-28">Actions</th>
+            </tr>
+            <tr>
+                {{#each admins}}
+                    <tr class="text-sm hover:bg-gray-700">
+                        <td class="border border-[#40403C] p-3 h-15"><p class="text-left">{{this.name}}</p></td>
+                        <td class="border border-[#40403C] p-3 h-15"><p class="text-center">{{this.real_id}}</p></td>
+                         <td class="border border-[#40403C] p-3 h-15"><p class="text-center">{{this.email}}</p></td>                       
+                        <td class="border border-[#40403C] p-3 h-15">
+                            <div class="flex flex-row items-center justify-around">
+                                <button data-id="{{this.id}}" class="editBtn hover:cursor-pointer hover:outline-white hover:outline rounded-2xl">
+                                    <img src="/images/edit.png" class="h-8" alt="">
+                                </button>
+                                <form action="/delete" method="post">
+                                    <input type="hidden" name="id" value="{{this.id}}">
+                                    <button type="submit" class="deleteBtn hover:cursor-pointer hover:outline-white hover:outline rounded-2xl">
+                                        <img src="/images/bin.png" class="h-8" alt="">
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                {{/each}}
+            </tr>
+
+        </table>
+    </div>
+</div>
+
+<script>
+    const addAdmin = document.getElementById("addAdmin");
+    const modal = document.getElementById("modal");
+    const closeModal = document.getElementById("closeModal");
+
+    addAdmin.addEventListener("click", () => {
+        modal.classList.remove("hidden");
+        modal.classList.add("flex");
+    })
+
+    closeModal.addEventListener("click", () => {
+        modal.classList.add("hidden");
+        modal.classList.remove("flex");
+    })
+</script>

@@ -1,0 +1,23 @@
+{
+  "name": "school-score-management-system",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "nodemon ./bin/www",
+    "tailwind": "npx @tailwindcss/cli -i ./public/stylesheets/input.css -o ./public/stylesheets/style.css --watch"
+  },
+  "dependencies": {
+    "@tailwindcss/cli": "^4.2.1",
+    "bcrypt": "^6.0.0",
+    "cookie-parser": "~1.4.4",
+    "debug": "~2.6.9",
+    "express": "~4.16.1",
+    "express-session": "^1.19.0",
+    "hbs": "~4.0.4",
+    "http-errors": "~1.6.3",
+    "morgan": "~1.9.1",
+    "nodemon": "^3.1.14",
+    "sqlite3": "^5.1.7",
+    "tailwindcss": "^4.2.1"
+  }
+}

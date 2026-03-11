@@ -1,0 +1,43 @@
+<div class="flex flex-col items-center font-[Google_Sans_Flex] justify-center bg-[#262624] min-h-screen">
+    <form action="/login" method="POST" class="flex flex-col text-white w-[96vw] lg:w-[40vw] px-10 py-12">
+        <h1 class="text-center text-[#9FAD95] text-5xl mb-8">Login</h1>
+        <div class="flex flex-row justify-between">
+            <label for="email" class="mb-2 text-[#9FAD95]">Email</label>
+            <p class="text-red-500">{{emailErr}}</p>
+        </div>
+        <input type="text" name="email" class="focus: outline-none mb-6 text-lg border-white border rounded h-12 px-4">
+
+        <div>
+            <label for="password" class="mb-2 text-[#9FAD95]">Password</label>
+            <p class="text-red-500">{{passwordErr}}</p>
+        </div>
+        <div class="flex flex-row border items-center border-white rounded px-4">
+            <input id="password" type="password" name="password" class="focus: outline-none text-lg rounded w-full h-12">
+            <button type="button" id="showPasswordBtn"><img id="showPassword" src="/images/show.png" alt="" class="h-6"></button>
+        </div>
+         
+        <button type="submit" class="py-3 bg-[#f0460d] hover:bg-orange-700 font-normal rounded mt-8 text-xl ">Login</button>
+    </form>
+</div>
+
+<script>
+    const showPasswordBtn = document.getElementById("showPasswordBtn");
+    const showPassword = document.getElementById("showPassword");
+    const password = document.getElementById("password");
+
+    let showPasswordState = false;
+
+    showPasswordBtn.addEventListener("click", () => {
+        if (showPasswordState == false){
+            showPassword.src = "/images/hide.png";
+            showPasswordState = true;
+            password.type = "text";
+        }
+        else {
+            showPassword.src = "/images/show.png";
+            showPasswordState = false;
+            password.type = "password";
+        }
+    })
+
+</script>
