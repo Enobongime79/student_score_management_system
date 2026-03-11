@@ -5,3 +5,4 @@ node_modules/
 *.tmp
 /vendor/
 /dist/
+db/data.db
