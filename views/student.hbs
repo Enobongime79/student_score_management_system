@@ -1,84 +1,9 @@
 <div class="min-h-screen bg-[#262624] font-[Google_Sans_Flex]">
 
   <div class="fixed inset-0 pointer-events-none z-0 opacity-[0.025]" style="background-image:url('data:image/svg+xml,%3Csvg viewBox=%220 0 256 256%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22n%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.9%22 numOctaves=%224%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23n)%22/%3E%3C/svg%3E');background-size:200px"></div>
-
-  <style>
-    .input-field {
-      background: #1e1e1c;
-      border: 1px solid #40403C;
-      color: white;
-      border-radius: 8px;
-      height: 40px;
-      padding: 0 12px;
-      width: 100%;
-      font-family: inherit;
-      font-size: 13px;
-      transition: border-color 0.2s, box-shadow 0.2s;
-      outline: none;
-    }
-    .input-field:focus {
-      border-color: #f0460d;
-      box-shadow: 0 0 0 3px rgba(240,70,13,0.12);
-    }
-    .input-field::placeholder { color: #555552; }
-    .input-field[type=number]::-webkit-inner-spin-button,
-    .input-field[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
-    .input-field[type=number] { -moz-appearance: textfield; }
-
-    .table-row { transition: background 0.2s ease; }
-    .table-row:hover { background: rgba(240,70,13,0.04); }
-
-    .action-btn {
-      width: 30px; height: 30px;
-      border-radius: 7px;
-      display: flex; align-items: center; justify-content: center;
-      border: 1px solid transparent;
-      transition: all 0.2s ease;
-      cursor: pointer;
-      background: transparent;
-    }
-    .action-btn:hover { border-color: #40403C; background: #2e2e2c; }
-
-    .score-pill {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-width: 40px;
-      padding: 2px 8px;
-      border-radius: 6px;
-      font-size: 12px;
-      font-weight: 500;
-      background: #1e1e1c;
-      border: 1px solid #40403C;
-      color: #c2c0b6;
-    }
-
-    .tag {
-      display: inline-flex; align-items: center;
-      background: rgba(240,70,13,0.1);
-      border: 1px solid rgba(240,70,13,0.2);
-      color: #f0460d;
-      border-radius: 6px;
-      font-size: 11px;
-      padding: 2px 8px;
-      font-weight: 500;
-    }
-
-    .grade-badge {
-      display: inline-flex; align-items: center; justify-content: center;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid #40403C;
-      color: #c2c0b6;
-      border-radius: 6px;
-      font-size: 11px;
-      padding: 2px 10px;
-      font-weight: 500;
-    }
-  </style>
-
   <nav class="relative z-10 flex items-center lg:mx-16 mx-5 py-5 border-b border-[#40403C]">
     <div class="flex items-center gap-3">
-      <div class="w-8 h-8 rounded-lg bg-[#f0460d]/15 border border-[#f0460d]/25 flex items-center justify-center flex-shrink-0">
+      <div class="w-8 h-8 rounded-lg bg-[#f0460d]/15 border border-[#f0460d]/25 flex items-center justify-center shrink-0">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#f0460d" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/>
         </svg>
@@ -97,9 +22,8 @@
     </button>
   </nav>
 
-  <!-- ADD Modal -->
   <div id="modal" class="fixed hidden text-white bg-[rgba(0,0,0,0.75)] backdrop-blur-sm font-[Google_Sans_Flex] top-0 left-0 flex-row items-center justify-center z-50 w-screen h-screen">
-    <div class="bg-[#262624] border border-[#40403C] w-[92vw] sm:w-[480px] rounded-xl p-6 shadow-2xl">
+    <div class="bg-[#262624] border border-[#40403C] w-[92vw] sm:w-120 rounded-xl p-6 shadow-2xl">
       <div class="flex items-center justify-between mb-5 pb-4 border-b border-[#40403C]">
         <div>
           <p class="text-white text-sm font-medium">New Student</p>
@@ -114,26 +38,26 @@
       <form action="/students" method="POST" class="flex flex-col gap-4">
         <div class="flex flex-col gap-1.5">
           <label for="fullName" class="text-xs text-[#888885] font-medium tracking-wide uppercase">Full Name</label>
-          <input name="fullName" id="fullName" type="text" placeholder="e.g. Jane Smith" class="input-field">
+          <input name="fullName" id="fullName" type="text" placeholder="e.g. Jane Smith" class="border border-[#40403C] focus:outline-none px-2 py-2 text-sm rounded">
         </div>
         <div class="grid grid-cols-2 gap-3">
           <div class="flex flex-col gap-1.5">
             <label for="grade" class="text-xs text-[#888885] font-medium tracking-wide uppercase">Grade (1–12)</label>
-            <input name="grade" id="grade" type="number" placeholder="1 – 12" class="input-field">
+            <input name="grade" id="grade" type="number" placeholder="1 – 12" class="border border-[#40403C] focus:outline-none px-2 py-2 text-sm rounded">
           </div>
           <div class="flex flex-col gap-1.5">
             <label for="mathScore" class="text-xs text-[#888885] font-medium tracking-wide uppercase">Math Score</label>
-            <input name="mathScore" id="mathScore" type="number" placeholder="0 – 100" class="input-field">
+            <input name="mathScore" id="mathScore" type="number" placeholder="0 – 100" class="border border-[#40403C] focus:outline-none px-2 py-2 text-sm rounded">
           </div>
         </div>
         <div class="grid grid-cols-2 gap-3">
           <div class="flex flex-col gap-1.5">
             <label for="englishScore" class="text-xs text-[#888885] font-medium tracking-wide uppercase">English Score</label>
-            <input name="englishScore" id="englishScore" type="number" placeholder="0 – 100" class="input-field">
+            <input name="englishScore" id="englishScore" type="number" placeholder="0 – 100" class="border border-[#40403C] focus:outline-none px-2 py-2 text-sm rounded">
           </div>
           <div class="flex flex-col gap-1.5">
             <label for="scienceScore" class="text-xs text-[#888885] font-medium tracking-wide uppercase">Science Score</label>
-            <input name="scienceScore" id="scienceScore" type="number" placeholder="0 – 100" class="input-field">
+            <input name="scienceScore" id="scienceScore" type="number" placeholder="0 – 100" class="border border-[#40403C] focus:outline-none px-2 py-2 text-sm rounded">
           </div>
         </div>
         <button type="submit"
@@ -149,7 +73,7 @@
 
   <!-- EDIT Modal -->
   <div id="editModal" class="fixed hidden text-white bg-[rgba(0,0,0,0.75)] backdrop-blur-sm font-[Google_Sans_Flex] top-0 left-0 flex-row items-center justify-center z-50 w-screen h-screen">
-    <div class="bg-[#262624] border border-[#40403C] w-[92vw] sm:w-[480px] rounded-xl p-6 shadow-2xl">
+    <div class="bg-[#262624] border border-[#40403C] w-[92vw] sm:w-120 rounded-xl p-6 shadow-2xl">
       <div class="flex items-center justify-between mb-5 pb-4 border-b border-[#40403C]">
         <div>
           <p class="text-white text-sm font-medium">Edit Student</p>
@@ -164,26 +88,26 @@
       <form action="/students/save_details" method="POST" class="flex flex-col gap-4">
         <div class="flex flex-col gap-1.5">
           <label for="editFullName" class="text-xs text-[#888885] font-medium tracking-wide uppercase">Full Name</label>
-          <input name="fullName" id="editFullName" type="text" placeholder="Full Name" class="input-field">
+          <input name="fullName" id="editFullName" type="text" placeholder="Full Name" class="border border-[#40403C] focus:outline-none px-2 py-2 text-sm rounded">
         </div>
         <div class="grid grid-cols-2 gap-3">
           <div class="flex flex-col gap-1.5">
             <label for="editGrade" class="text-xs text-[#888885] font-medium tracking-wide uppercase">Grade (1–12)</label>
-            <input name="grade" id="editGrade" type="number" placeholder="1 – 12" class="input-field">
+            <input name="grade" id="editGrade" type="number" placeholder="1 – 12" class="border border-[#40403C] focus:outline-none px-2 py-2 text-sm rounded">
           </div>
           <div class="flex flex-col gap-1.5">
             <label for="editMathScore" class="text-xs text-[#888885] font-medium tracking-wide uppercase">Math Score</label>
-            <input name="mathScore" id="editMathScore" type="number" placeholder="0 – 100" class="input-field">
+            <input name="mathScore" id="editMathScore" type="number" placeholder="0 – 100" class="border border-[#40403C] focus:outline-none px-2 py-2 text-sm rounded">
           </div>
         </div>
         <div class="grid grid-cols-2 gap-3">
           <div class="flex flex-col gap-1.5">
             <label for="editEnglishScore" class="text-xs text-[#888885] font-medium tracking-wide uppercase">English Score</label>
-            <input name="englishScore" id="editEnglishScore" type="number" placeholder="0 – 100" class="input-field">
+            <input name="englishScore" id="editEnglishScore" type="number" placeholder="0 – 100" class="border border-[#40403C] focus:outline-none px-2 py-2 text-sm rounded">
           </div>
           <div class="flex flex-col gap-1.5">
             <label for="editScienceScore" class="text-xs text-[#888885] font-medium tracking-wide uppercase">Science Score</label>
-            <input name="scienceScore" id="editScienceScore" type="number" placeholder="0 – 100" class="input-field">
+            <input name="scienceScore" id="editScienceScore" type="number" placeholder="0 – 100" class="border border-[#40403C] focus:outline-none px-2 py-2 text-sm rounded">
           </div>
         </div>
         <input id="real_id" type="hidden" name="real_id">
@@ -227,19 +151,19 @@
                 <span class="text-sm text-white font-medium whitespace-nowrap">{{this.name}}</span>
               </td>
               <td class="px-4 py-3.5">
-                <span class="tag">{{this.real_id}}</span>
+                <span class="text-center text-xs p-1 bg-gray-700 rounded">{{this.real_id}}</span>
               </td>
               <td class="px-4 py-3.5">
-                <span class="grade-badge">{{this.class}}</span>
+                <span class="text-xs text-orange-600 rounded py-1 px-2 border border-orange-600">{{this.class}}</span>
               </td>
               <td class="px-4 py-3.5 text-center">
-                <span class="score-pill">{{this.math}}</span>
+                <span class="text-xs rounded py-1 px-2 math_value">{{this.math}}</span>
               </td>
               <td class="px-4 py-3.5 text-center">
-                <span class="score-pill">{{this.english}}</span>
+                <span class="text-xs rounded py-1 px-2 english_value">{{this.english}}</span>
               </td>
               <td class="px-4 py-3.5 text-center">
-                <span class="score-pill">{{this.science}}</span>
+                <span class="text-xs rounded py-1 px-2 science_value">{{this.science}}</span>
               </td>
               <td class="px-4 py-3.5 text-center">
                 <span class="text-sm text-white font-medium">{{this.total}}</span>
@@ -391,4 +315,51 @@
       editModal.classList.add("flex");
     });
   });
+
+  const math_values = document.querySelectorAll(".math_value");
+  const english_values = document.querySelectorAll(".english_value");
+  const science_values = document.querySelectorAll(".science_value");
+
+  math_values.forEach(
+    row => {
+      if (parseInt(row.innerText) > 75){
+        row.classList.add('bg-green-500')
+      }
+      if ((parseInt(row.innerText) < 75) && (parseInt(row.innerText) >= 45)){
+        row.classList.add('bg-yellow-500')
+      }
+      if (parseInt(row.innerText) < 45){
+        row.classList.add('bg-red-500')
+      }
+    }
+  )
+
+  english_values.forEach(
+    row => {
+      if (parseInt(row.innerText) > 75){
+        row.classList.add('bg-green-500')
+      }
+      if ((parseInt(row.innerText) < 75) && (parseInt(row.innerText) >= 45)){
+        row.classList.add('bg-yellow-500')
+      }
+      if (parseInt(row.innerText) < 45){
+        row.classList.add('bg-red-500')
+      }
+    }
+  )
+
+  science_values.forEach(
+    row => {
+      if (parseInt(row.innerText) > 75){
+        row.classList.add('bg-green-500')
+      }
+      if ((parseInt(row.innerText) < 75) && (parseInt(row.innerText) >= 45)){
+        row.classList.add('bg-yellow-500')
+      }
+      if (parseInt(row.innerText) < 45){
+        row.classList.add('bg-red-500')
+      }
+    }
+  )
+
 </script>

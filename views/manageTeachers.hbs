@@ -1,0 +1,227 @@
+<div class="min-h-screen bg-[#262624] font-[Google_Sans_Flex]">
+
+  <div class="fixed inset-0 pointer-events-none z-0 opacity-[0.025]" style="background-image:url('data:image/svg+xml,%3Csvg viewBox=%220 0 256 256%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22n%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.9%22 numOctaves=%224%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23n)%22/%3E%3C/svg%3E');background-size:200px"></div>
+
+  <style>
+    .input-field {
+      background: #1e1e1c;
+      border: 1px solid #40403C;
+      color: white;
+      border-radius: 8px;
+      height: 40px;
+      padding: 0 12px;
+      width: 100%;
+      font-family: inherit;
+      font-size: 13px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      outline: none;
+    }
+    .input-field:focus {
+      border-color: #f0460d;
+      box-shadow: 0 0 0 3px rgba(240,70,13,0.12);
+    }
+    .input-field::placeholder { color: #555552; }
+
+    .table-row { transition: background 0.2s ease; }
+    .table-row:hover { background: rgba(240,70,13,0.05); }
+
+    .action-btn {
+      width: 32px; height: 32px;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      border: 1px solid transparent;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      background: transparent;
+    }
+    .action-btn:hover { border-color: #40403C; background: #2e2e2c; }
+
+    .tag {
+      display: inline-flex; align-items: center;
+      background: rgba(240,70,13,0.1);
+      border: 1px solid rgba(240,70,13,0.2);
+      color: #f0460d;
+      border-radius: 6px;
+      font-size: 11px;
+      padding: 2px 8px;
+      font-weight: 500;
+    }
+  </style>
+
+  <nav class="relative z-10 flex items-center lg:mx-16 mx-5 py-5 border-b border-[#40403C]">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 rounded-lg bg-[#f0460d]/15 border border-[#f0460d]/25 flex items-center justify-center flex-shrink-0">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#f0460d" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+        </svg>
+      </div>
+      <div>
+        <p class="text-white text-sm lg:text-base font-medium leading-none">Teacher Manager</p>
+        <p class="text-[#555552] text-xs mt-0.5 leading-none">Student Score Manager</p>
+      </div>
+    </div>
+    <button id="addTeacher"
+      class="ms-auto text-xs lg:text-sm text-white font-medium rounded-lg bg-[#f0460d] hover:bg-[#d03c0b] px-4 py-2.5 flex items-center gap-2 cursor-pointer transition-colors duration-200">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>
+      Add Teacher
+    </button>
+  </nav>
+
+  <!-- ADD Modal -->
+  <div id="modal" class="fixed hidden text-white bg-[rgba(0,0,0,0.75)] backdrop-blur-sm font-[Google_Sans_Flex] top-0 left-0 flex-row items-center justify-center z-50 w-screen h-screen">
+    <div class="bg-[#262624] border border-[#40403C] w-[92vw] sm:w-[420px] rounded-xl p-6 shadow-2xl">
+      <div class="flex items-center justify-between mb-5 pb-4 border-b border-[#40403C]">
+        <div>
+          <p class="text-white text-sm font-medium">New Teacher</p>
+          <p class="text-[#555552] text-xs mt-0.5">Fill in the details to add an teacher</p>
+        </div>
+        <button id="closeModal" class="action-btn ml-4">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#888885" stroke-width="2.5" stroke-linecap="round">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      <form action="/super_admin/manage_teachers/add_teachers" method="POST" class="flex flex-col gap-4">
+        <div class="flex flex-col gap-1.5">
+          <label for="name" class="text-xs text-[#888885] font-medium tracking-wide uppercase">Full Name</label>
+          <input name="name" id="name" type="text" placeholder="e.g. John Doe" class="input-field">
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label for="fullName" class="text-xs text-[#888885] font-medium tracking-wide uppercase">Grade</label>
+          <input name="grade" id="grade" type="text" placeholder="Enter 1 - 12" class="input-field">
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label for="email" class="text-xs text-[#888885] font-medium tracking-wide uppercase">Email Address</label>
+          <input name="email" id="email" type="text" placeholder="e.g. john@school.edu" class="input-field">
+        </div>
+        <button type="submit"
+          class="mt-2 bg-[#f0460d] hover:bg-[#d03c0b] text-white text-sm font-medium py-2.5 rounded-lg cursor-pointer transition-colors duration-200 flex items-center justify-center gap-2">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+          Add Teacher
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- EDIT Modal -->
+  <div id="editModal" class="fixed hidden text-white bg-[rgba(0,0,0,0.75)] backdrop-blur-sm font-[Google_Sans_Flex] top-0 left-0 flex-row items-center justify-center z-50 w-screen h-screen">
+    <div class="bg-[#262624] border border-[#40403C] w-[92vw] sm:w-[420px] rounded-xl p-6 shadow-2xl">
+      <div class="flex items-center justify-between mb-5 pb-4 border-b border-[#40403C]">
+        <div>
+          <p class="text-white text-sm font-medium">Edit Teacher</p>
+          <p class="text-[#555552] text-xs mt-0.5">Update the teacher's information</p>
+        </div>
+        <button id="closeEditModal" class="action-btn ml-4">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#888885" stroke-width="2.5" stroke-linecap="round">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      <form action="/students/save_details" method="POST" class="flex flex-col gap-4">
+        <div class="flex flex-col gap-1.5">
+          <label for="editFullName" class="text-xs text-[#888885] font-medium tracking-wide uppercase">Full Name</label>
+          <input name="fullName" id="editFullName" type="text" placeholder="Full Name" class="input-field">
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label for="editEmail" class="text-xs text-[#888885] font-medium tracking-wide uppercase">Email Address</label>
+          <input name="email" id="editEmail" type="text" placeholder="Email" class="input-field">
+        </div>
+        <input id="real_id" type="hidden" name="real_id">
+        <button id="saveBtn" type="submit"
+          class="mt-2 bg-[#f0460d] hover:bg-[#d03c0b] text-white text-sm font-medium py-2.5 rounded-lg cursor-pointer transition-colors duration-200 flex items-center justify-center gap-2">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/>
+          </svg>
+          Save Changes
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <main class="relative z-10 lg:mx-16 mx-5 py-8">
+    <div class="mb-6">
+      <p class="text-[#f0460d] text-xs font-medium tracking-[0.18em] uppercase mb-0.5">Directory</p>
+      <h2 class="text-white text-xl font-medium">Teachers</h2>
+    </div>
+
+    <div class="border border-[#40403C] rounded-xl overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-white">
+          <thead>
+            <tr class="bg-[#2e2e2c] border-b border-[#40403C]">
+              <th class="text-left px-5 py-3.5 text-xs font-medium text-[#888885] tracking-wider uppercase">Name</th>
+              <th class="text-left px-5 py-3.5 text-xs font-medium text-[#888885] tracking-wider uppercase">Teacher ID</th>
+              <th class="text-left px-5 py-3.5 text-xs font-medium text-[#888885] tracking-wider uppercase hidden sm:table-cell">Email</th>
+              <th class="text-center px-5 py-3.5 text-xs font-medium text-[#888885] tracking-wider uppercase">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{#each teachers}}
+            <tr class="table-row border-b border-[#40403C] last:border-b-0">
+              <td class="px-5 py-4">
+                <span class="text-sm text-white font-medium">{{this.name}}</span>
+              </td>
+              <td class="px-5 py-4">
+                <span class="tag">{{this.real_id}}</span>
+              </td>
+              <td class="px-5 py-4 hidden sm:table-cell">
+                <span class="text-sm text-[#c2c0b6]">{{this.email}}</span>
+              </td>
+              <td class="px-5 py-4">
+                <div class="flex items-center justify-center gap-2">
+                  <button data-id="{{this.id}}" class="editBtn action-btn" title="Edit teacher">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#888885" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                    </svg>
+                  </button>
+                  <form action="/delete" method="post">
+                    <input type="hidden" name="id" value="{{this.id}}">
+                    <button type="submit" class="deleteBtn action-btn hover:!border-red-700/50 hover:!bg-red-900/20" title="Delete admin">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#888885" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                        <path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+                      </svg>
+                    </button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+            {{/each}}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="{{#if teachers}}hidden{{/if}} flex flex-col items-center justify-center py-16 text-center">
+        <div class="w-12 h-12 rounded-xl bg-[#2e2e2c] border border-[#40403C] flex items-center justify-center mb-4">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#555552" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+          </svg>
+        </div>
+        <p class="text-[#888885] text-sm font-medium">No teachers yet</p>
+        <p class="text-[#555552] text-xs mt-1">Click "Add Teachers" to get started</p>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+  const addTeacher = document.getElementById("addTeacher");
+  const modal = document.getElementById("modal");
+  const closeModal = document.getElementById("closeModal");
+
+  addTeacher.addEventListener("click", () => {
+    modal.classList.remove("hidden");
+    modal.classList.add("flex");
+  });
+
+  closeModal.addEventListener("click", () => {
+    modal.classList.add("hidden");
+    modal.classList.remove("flex");
+  });
+</script>

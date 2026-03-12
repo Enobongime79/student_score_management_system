@@ -31,6 +31,70 @@ router.get("/manage_admins", (req, res) => {
   }
 })
 
+router.get("/manage_teachers", (req, res) => {
+   if (!req.session.user){
+    return res.redirect("/")
+  }
+
+  else{
+    db.all(`SELECT * FROM staff JOIN teachers ON staff.id = teachers.teacher_id`, [], (err, rows) => {
+
+      if (err){
+        console.log(err.message)
+      }
+      console.log(rows);
+
+      rows.forEach(teacher => {
+        teacher.real_id = 'TEA_' + teacher.id;
+      })
+
+      res.render('manageTeachers', { title: 'Teacher Manager', teachers: rows });
+    })
+  }
+})
+
+router.post("/manage_teachers/add_teachers", (req, res) => {
+  const { name, email } = req.body;
+  const password = "teacher12345";
+  const role = 'teacher';
+  let id;
+
+  async function createUser() {
+    try {
+      const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+      db.run(
+      `INSERT INTO staff (name, email, password, role) VALUES (?, ?, ?, ?)`,
+      [name, email, hashedPassword, role],
+       function (err) {
+        if (err) {
+          console.log(err.message);
+          return;
+        }
+
+        const staffId = this.lastID; // SQLite gives you the inserted id
+
+        db.run(
+          `INSERT INTO teachers (name, teacher_id) VALUES (?, ?)`,
+          [name, staffId],
+          (err) => {
+            if (err) console.log(err.message);
+            else console.log("Inserted Successfully!");
+          }
+        );
+      }
+    );
+    return res.redirect('/super_admin/manage_teachers')
+    }
+      catch (err) {
+      console.error(err);
+    }
+  }
+
+createUser();
+
+})
+
 router.post("/manage_admins/add_admins", (req, res) => {
   const { name, email } = req.body;
   const password = "admin12345";
