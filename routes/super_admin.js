@@ -6,7 +6,13 @@ const saltRounds = 10;
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
-  res.render('superadmin');
+  if (!req.session.user){
+    return res.redirect("/")
+  }
+  else {
+    res.render('superadmin');
+  }
+
 });
 
 router.get("/manage_admins", (req, res) => {
@@ -48,13 +54,17 @@ router.get("/manage_teachers", (req, res) => {
         teacher.real_id = 'TEA_' + teacher.id;
       })
 
+      rows.forEach(teacher => {
+        teacher.grade = "Grade " + teacher.class;
+      })
+
       res.render('manageTeachers', { title: 'Teacher Manager', teachers: rows });
     })
   }
 })
 
 router.post("/manage_teachers/add_teachers", (req, res) => {
-  const { name, email } = req.body;
+  const { name, email, grade } = req.body;
   const password = "teacher12345";
   const role = 'teacher';
   let id;
@@ -75,8 +85,8 @@ router.post("/manage_teachers/add_teachers", (req, res) => {
         const staffId = this.lastID; // SQLite gives you the inserted id
 
         db.run(
-          `INSERT INTO teachers (name, teacher_id) VALUES (?, ?)`,
-          [name, staffId],
+          `INSERT INTO teachers (name, class, teacher_id) VALUES (?, ?, ?)`,
+          [name, grade, staffId],
           (err) => {
             if (err) console.log(err.message);
             else console.log("Inserted Successfully!");
@@ -94,6 +104,63 @@ router.post("/manage_teachers/add_teachers", (req, res) => {
 createUser();
 
 })
+
+router.post("/manage_teachers/edit_teachers", (req, res) => {
+  const { id } = req.body;
+  const query = `SELECT * FROM staff JOIN teachers ON staff.id = teachers.teacher_id WHERE teachers.id = ?`;
+
+  db.get(query, [id], (err, row) => {
+    if (err){
+      res.status(500).json({ error: err.message})
+    }
+    else {
+      console.log("Successfully got the row");
+      res.json(row);
+      console.log(row);
+    }
+  })
+})
+
+router.post("/manage_teachers/save_details", (req, res) => {
+  const { editFullName, editGrade, editEmail, real_id } = req.body;
+  const query = `UPDATE teachers SET name = ?, class = ? WHERE id = ?`;
+  let staff_id;
+
+    db.run(query, [editFullName, editGrade, real_id], (err) => {
+      if (err){
+        console.log(err.message);
+        return res.send("Error updating teacher!")
+      }
+
+      db.get(`SELECT teacher_id FROM teachers WHERE id = ?`, [real_id], (err, result) => {
+        if (err){
+          console.log(err.message);
+          return res.send("Error fetching teacher_id");
+        }
+
+        if (!result) {
+          return res.send("Teacher not found!")
+        }
+
+        staff_id = result.teacher_id
+
+        db.run(`UPDATE staff SET name = ?, email = ? WHERE id = ?`, [editFullName, editEmail, staff_id], (err) => {
+          if (err){
+            console.log(err.message);
+          }
+          else{
+            console.log("Updated the teachers details in the staff table!");
+            return res.redirect("/super_admin/manage_teachers")
+          }
+        });
+      });
+    });
+});
+
+router.post("manage_teacher/delete_teachers", (req, res) => {
+  
+})
+
 
 router.post("/manage_admins/add_admins", (req, res) => {
   const { name, email } = req.body;
@@ -114,7 +181,7 @@ router.post("/manage_admins/add_admins", (req, res) => {
           return;
         }
 
-        const staffId = this.lastID; // SQLite gives you the inserted id
+        const staffId = this.lastID;
 
         db.run(
           `INSERT INTO admins (name, admin_id) VALUES (?, ?)`,
@@ -135,6 +202,57 @@ router.post("/manage_admins/add_admins", (req, res) => {
 
 createUser();
 
+})
+
+router.post("/manage_admins/edit_admins", (req, res) => {
+  const { id } = req.body;
+  const query = `SELECT * FROM staff JOIN admins ON staff.id = admins.admin_id WHERE admins.id = ?`;
+
+  db.get(query, [id], (err, row) => {
+    if (err){
+      res.status(500).json({ error: err.message})
+    }
+    else {
+      console.log("Successfully got the row");
+      res.json(row);
+      console.log(row);
+    }
+  })
+})
+
+router.post("/manage_admins/save_details", (req, res) =>{
+  const { editFullName, editGrade, editEmail, real_id } = req.body;
+  const query = `UPDATE teachers SET name = ?, class = ? WHERE id = ?`;
+  let staff_id;
+
+  db.serialize(() => {
+    db.run(query, [editFullName, editGrade, real_id], (err) => {
+      if (err){
+        console.log(err.message);
+      }
+      else{
+        console.log("Successfully updated the teachers details!");
+      }
+    });
+    db.get(`SELECT teacher_id FROM teachers WHERE id = ?`, [real_id], (err, result) => {
+      if (err){
+        console.log(err.message);
+      }
+      else{
+        console.log(result)
+        staff_id = result.teacher_id;
+      }
+    });
+    db.run(`UPDATE staff SET name = ?, email = ? WHERE id = ?`, [editFullName, editEmail, staff_id], (err) => {
+      if (err){
+        console.log(err.message);
+      }
+      else{
+        console.log("Updated the teachers details in the staff table!");
+        return res.redirect("/super_admin/manage_teachers")
+      }
+    })
+  });
 })
 
 module.exports = router;

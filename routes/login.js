@@ -38,7 +38,7 @@ router.post('/', (req, res) => {
                 return res.redirect('/super_admin');
             }
             if (result.role == "admin"){
-                
+                return res.redirect('/admin');
             }
         }
     })

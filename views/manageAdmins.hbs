@@ -118,7 +118,7 @@
           </svg>
         </button>
       </div>
-      <form action="/students/save_details" method="POST" class="flex flex-col gap-4">
+      <form action="/super_admin/manage_admins/save_details" method="POST" class="flex flex-col gap-4">
         <div class="flex flex-col gap-1.5">
           <label for="editFullName" class="text-xs text-[#888885] font-medium tracking-wide uppercase">Full Name</label>
           <input name="fullName" id="editFullName" type="text" placeholder="Full Name" class="input-field">
@@ -220,4 +220,41 @@
     modal.classList.add("hidden");
     modal.classList.remove("flex");
   });
+
+  const editBtns = document.querySelectorAll('.editBtn');
+  const editFullName = document.getElementById("editFullName");
+  const real_id = document.getElementById("real_id");
+  const editEmail = document.getElementById("editEmail");
+  const editModal = document.getElementById("editModal");
+
+  editBtns.forEach(button => {
+    button.addEventListener("click", async () => {
+      console.log('clicked')
+      const id = button.dataset.id;
+
+      const response = await fetch("/super_admin/manage_admins/edit_admins", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: id })
+      });
+
+      const data = await response.json();
+      console.log(data);
+
+    editFullName.value = data['name'];
+    real_id.value = data['id'];
+    editEmail.value = data['email'];
+
+    editModal.classList.remove("hidden");
+    editModal.classList.add("flex");
+    });
+  });
+
+  const closeEditModal = document.getElementById("closeEditModal")
+  
+  closeEditModal.addEventListener("click", () => {
+    editModal.classList.add("hidden")
+  }) 
+
+
 </script>

@@ -67,7 +67,7 @@ router.post("/delete", (req, res) => {
     }
   })
   
-  res.redirect('/')
+  res.redirect('/students')
 })
 
 router.post("/edit", (req, res) => {

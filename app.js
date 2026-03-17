@@ -10,6 +10,8 @@ var usersRouter = require('./routes/users');
 var loginRouter = require('./routes/login');
 var studentRouter = require('./routes/student');
 var superAdminRouter = require('./routes/super_admin');
+var adminRouter = require('./routes/admin');
+var logoutRouter = require('./routes/logout')
 
 
 var app = express();
@@ -38,6 +40,8 @@ app.use('/users', usersRouter);
 app.use('/login', loginRouter);
 app.use('/students', studentRouter);
 app.use('/super_admin', superAdminRouter);
+app.use('/admin', adminRouter);
+app.use('/logout', logoutRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
