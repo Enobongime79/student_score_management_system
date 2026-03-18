@@ -157,8 +157,38 @@ router.post("/manage_teachers/save_details", (req, res) => {
     });
 });
 
-router.post("manage_teacher/delete_teachers", (req, res) => {
-  
+router.post("/manage_teachers/delete_teachers", (req, res) => {
+  const { id } = req.body;
+  const query = `DELETE FROM teachers WHERE id = ?`;
+  let staff_id;
+
+  db.get(`SELECT teacher_id FROM teachers WHERE id = ?`, [id], (err, result) => {
+    if (err){
+      return console.error(err.message);
+    }
+    if (!result){
+      return console.log(`Row with id:${id} does not exist in the database!`)
+    }
+
+    staff_id = result.teacher_id
+
+    db.run(query, [id], function (err) {
+
+      if (err){
+        return console.error(err.message);
+      }
+
+      db.run(`DELETE FROM staff WHERE id = ?`, [staff_id], (err, result) => {
+        if (err){
+          return console.log(err.message)
+        }
+        
+        console.log("Successfully deleted from the staff table!")
+
+        return res.redirect('/super_admin/manage_teachers')
+      });
+    });
+  });
 })
 
 
@@ -221,38 +251,41 @@ router.post("/manage_admins/edit_admins", (req, res) => {
 })
 
 router.post("/manage_admins/save_details", (req, res) =>{
-  const { editFullName, editGrade, editEmail, real_id } = req.body;
-  const query = `UPDATE teachers SET name = ?, class = ? WHERE id = ?`;
+  const { editFullName, editEmail, real_id } = req.body;
+  const query = `UPDATE admins SET name = ? WHERE id = ?`;
   let staff_id;
+  console.log(editFullName)
 
-  db.serialize(() => {
-    db.run(query, [editFullName, editGrade, real_id], (err) => {
+  db.run(query, [editFullName, real_id], (err) => {
       if (err){
         console.log(err.message);
+        return res.send("Error updating admin!")
       }
-      else{
-        console.log("Successfully updated the teachers details!");
-      }
+
+      db.get(`SELECT admin_id FROM admins WHERE id = ?`, [real_id], (err, result) => {
+        if (err){
+          console.log(err.message);
+          return res.send("Error fetching admin_id");
+        }
+
+        if (!result) {
+          return res.send("Admin not found!")
+        }
+
+        staff_id = result.admin_id;
+        console.log(staff_id)
+
+        db.run(`UPDATE staff SET name = ?, email = ? WHERE id = ?`, [editFullName, editEmail, staff_id], (err) => {
+          if (err){
+            console.log(err.message);
+          }
+          else{
+            console.log("Updated the admins details in the staff table!");
+            return res.redirect("/super_admin/manage_admins")
+          }
+        });
+      });
     });
-    db.get(`SELECT teacher_id FROM teachers WHERE id = ?`, [real_id], (err, result) => {
-      if (err){
-        console.log(err.message);
-      }
-      else{
-        console.log(result)
-        staff_id = result.teacher_id;
-      }
-    });
-    db.run(`UPDATE staff SET name = ?, email = ? WHERE id = ?`, [editFullName, editEmail, staff_id], (err) => {
-      if (err){
-        console.log(err.message);
-      }
-      else{
-        console.log("Updated the teachers details in the staff table!");
-        return res.redirect("/super_admin/manage_teachers")
-      }
-    })
-  });
 })
 
 module.exports = router;

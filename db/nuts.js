@@ -25,7 +25,7 @@ const db = require("../db/database")
 // }
 
 // createUser();
-db.run("DELETE FROM staff WHERE email = ?", ["tessy@gmail.com"], (err) => {
+db.run("DELETE FROM staff WHERE id = ?", [15], (err) => {
   if (err){
     console.log(err.message);
   }
