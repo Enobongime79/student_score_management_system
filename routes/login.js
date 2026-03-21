@@ -15,7 +15,7 @@ router.post('/', (req, res) => {
         email: email,
     }
 
-    const query = `SELECT password, role FROM staff WHERE email = ?`;
+    const query = `SELECT id, password, role FROM staff WHERE email = ?`;
     
     db.get(query, [email], async (err, result) => {
         if (err){
@@ -33,6 +33,12 @@ router.post('/', (req, res) => {
         }
         else{
             console.log("Logged in successfully");
+
+            req.session.user = {
+                ...req.session.user,
+                id: result.id,
+                role: result.role
+            };
 
             if (result.role == "superadmin"){
                 return res.redirect('/super_admin');

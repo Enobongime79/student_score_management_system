@@ -6,11 +6,11 @@ const saltRounds = 10;
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
-  if (!req.session.user){
+  if (!req.session.user ||req.session.user.role != "admin"){
     return res.redirect("/")
   }
   else {
-    res.render('admin')
+    res.render('admin', { title: "Admin Dashboard"})
   }
 });
 
