@@ -1,3 +1,4 @@
+require('dotenv').config();
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
@@ -11,7 +12,8 @@ var loginRouter = require('./routes/login');
 var studentRouter = require('./routes/student');
 var superAdminRouter = require('./routes/super_admin');
 var adminRouter = require('./routes/admin');
-var logoutRouter = require('./routes/logout')
+var logoutRouter = require('./routes/logout');
+var teacherRouter = require('./routes/teacher');
 
 
 var app = express();
@@ -42,6 +44,7 @@ app.use('/students', studentRouter);
 app.use('/super_admin', superAdminRouter);
 app.use('/admin', adminRouter);
 app.use('/logout', logoutRouter);
+app.use('/teacher', teacherRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

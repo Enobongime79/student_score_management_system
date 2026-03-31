@@ -94,7 +94,7 @@
           </svg>
         </button>
       </div>
-      <form action="/super_admin/manage_teachers/add_teachers" method="POST" class="flex flex-col gap-4">
+      <form action="/admin/manage_teachers/add_teachers" method="POST" class="flex flex-col gap-4">
         <div class="flex flex-col gap-1.5">
           <label for="name" class="text-xs text-[#888885] font-medium tracking-wide uppercase">Full Name</label>
           <input name="name" id="name" type="text" placeholder="e.g. John Doe" class="input-field">
@@ -132,7 +132,7 @@
           </svg>
         </button>
       </div>
-      <form action="/super_admin/manage_teachers/save_details" method="POST" class="flex flex-col gap-4">
+      <form action="/admin/manage_teachers/save_details" method="POST" class="flex flex-col gap-4">
         <div class="flex flex-col gap-1.5">
           <label for="editFullName" class="text-xs text-[#888885] font-medium tracking-wide uppercase">Full Name</label>
           <input name="editFullName" id="editFullName" type="text" placeholder="Full Name" class="input-field">
@@ -200,7 +200,7 @@
                       <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
                     </svg>
                   </button>
-                  <form action="/super_admin/manage_teachers/delete_teachers" method="post">
+                  <form action="/admin/manage_teachers/delete_teachers" method="post">
                     <input type="hidden" name="id" value="{{this.id}}">
                     <button type="submit" class="deleteBtn action-btn hover:border-red-700/50! hover:bg-red-900/20!" title="Delete teacher">
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#888885" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -270,7 +270,7 @@
     button.addEventListener("click", async () => {
       const id = button.dataset.id;
 
-      const response = await fetch("/super_admin/manage_teachers/edit_teachers", {
+      const response = await fetch("/admin/manage_teachers/edit_teachers", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: id })

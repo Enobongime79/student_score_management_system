@@ -1,4 +1,4 @@
-const db = require("../db/database")
+const { supabase } = require("../config/supabaseClient");
 // const bcrypt = require("bcrypt");
 // const saltRounds = 10;
 
@@ -11,25 +11,31 @@ const db = require("../db/database")
 //   try {
 //     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-//     db.run(
-//       `INSERT INTO staff (name, email, password, role) VALUES (?, ?, ?, ?)`,
-//       [name, email, hashedPassword, role],
-//       (err) => {
-//         if (err) console.error(err);
-//         else console.log("User created successfully!");
-//       }
-//     );
+//     const { error } = await supabase
+//       .from('staff')
+//       .insert([{ name, email, password: hashedPassword, role }]);
+
+//     if (error) console.error(error.message);
+//     else console.log("User created successfully!");
 //   } catch (err) {
 //     console.error(err);
 //   }
 // }
 
 // createUser();
-db.run("DELETE FROM staff WHERE id = ?", [15], (err) => {
-  if (err){
-    console.log(err.message);
-  }
-  else{
-    console.log("Deleted Successfully!")
-  }
-});
+
+async function deleteUser(id) {
+    const { error } = await supabase
+        .from('staff')
+        .delete()
+        .eq('id', id);
+
+    if (error){
+        console.log(error.message);
+    }
+    else{
+        console.log("Deleted Successfully!")
+    }
+}
+
+// deleteUser(15);

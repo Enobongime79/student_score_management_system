@@ -1,105 +1,120 @@
 var express = require('express');
 var router = express.Router();
-const db = require("../db/database")
+const { supabase } = require('../config/supabaseClient');
 
 /* GET home page. */
-router.get('/', function(req, res, next) {
+router.get('/', async function(req, res, next) {
 
   if (!req.session.user){
     return res.redirect("/")
   }
 
   else{
-      db.all(`SELECT * FROM users`, [], (err, rows) => {
-    if (err){
-      console.log(err.message)
+    const { data: rows, error } = await supabase
+        .from('users')
+        .select('*');
+
+    if (error){
+      console.log(error.message)
+      return res.status(500).send("Error fetching students")
     }
+    
     console.log(rows);
 
     rows.forEach(student => {
       student.average = ((student.math + student.english + student.science) / 3).toFixed(2);
+      student.real_id = 'STU_' + student.id;
+      student.total = (student.math + student.english + student.science);
     });
 
-    rows.forEach(student => {
-      student.real_id = 'STU_' + student.id;
-    })
-
-    rows.forEach(student => {
-      student.total = ((student.math + student.english + student.science))
-    })
-
     res.render('student', { title: 'Student Score Management System', students: rows });
-  })
   }
 
 });
 
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
   const { fullName, grade, mathScore, englishScore, scienceScore} = req.body;
+  const realGrade = grade.startsWith("Grade ") ? grade : "Grade " + grade;
 
-  const realGrade = "Grade " + grade; 
+  const { error } = await supabase
+    .from('users')
+    .insert([{
+        name: fullName,
+        class: realGrade,
+        math: mathScore,
+        english: englishScore,
+        science: scienceScore
+    }]);
 
-  db.run(
-    `INSERT INTO users (name, class, math, english, science) VALUES (?, ?, ?, ?, ?)`,
-    [fullName, realGrade, mathScore, englishScore, scienceScore], function(err) {
-      if (err) {
-        console.log(err.message);
-      } else {
-        console.log(`Inserted User with ID: ${this.lastID}`)
-      }
-    }
-  )
+  if (error) {
+    console.log(error.message);
+    return res.status(500).send("Error inserting user");
+  }
 
+  console.log("Inserted successfully");
   return res.redirect("/students")
 });
 
-router.post("/delete", (req, res) => {
+router.post("/delete", async (req, res) => {
   const { id } = req.body;
-  const query = `DELETE FROM users WHERE id = ?`;
+  
+  const { error } = await supabase
+    .from('users')
+    .delete()
+    .eq('id', id);
 
-  db.run(query, [id], function (err) {
-    if (err){
-      return console.error(err.message);
-    }
-    else {
-      console.log(id)
-      console.log("Deleted Successfully")
-    }
-  })
+  if (error){
+    console.error(error.message);
+  }
+  else {
+    console.log(id)
+    console.log("Deleted Successfully")
+  }
   
   res.redirect('/students')
 })
 
-router.post("/edit", (req, res) => {
+router.post("/edit", async (req, res) => {
   const { id } = req.body;
-  const query = `SELECT id, name, class, math, english, science FROM users WHERE id = ?`;
   
-  db.get(query, [id], (err, result) => {
-    if (err){
-      res.status(500).json({ error: err.message})
-    }
-    else {
-      res.json(result);
-      console.log(result);
-    }
-  })
+  const { data: result, error } = await supabase
+    .from('users')
+    .select('id, name, class, math, english, science')
+    .eq('id', id)
+    .single();
+
+  if (error){
+    res.status(500).json({ error: error.message})
+  }
+  else {
+    res.json(result);
+    console.log(result);
+  }
 })
 
-router.post("/save_details", (req, res) => {
+router.post("/save_details", async (req, res) => {
   const { fullName, grade, mathScore, englishScore, scienceScore, real_id } = req.body;
-  const query = `UPDATE users SET name = ?, class = ?, math = ?, english = ?, science = ? WHERE id = ?`;
+  const realGrade = grade.startsWith("Grade ") ? grade : "Grade " + grade;
 
-  const realGrade = "Grade " + grade
+  const { error } = await supabase
+    .from('users')
+    .update({
+        name: fullName,
+        class: realGrade,
+        math: mathScore,
+        english: englishScore,
+        science: scienceScore
+    })
+    .eq('id', real_id);
 
-  db.run(query, [fullName, realGrade, mathScore, englishScore, scienceScore, real_id], (err, result) => {
-    if (err){
-      console.log(err.message);
-    }
-    else{
-      console.log(result);
-      res.redirect('/students')
-    }
-  })
+  if (error){
+    console.log(error.message);
+    return res.status(500).send("Error updating student");
+  }
+  else{
+    console.log("Updated successfully");
+    res.redirect('/students')
+  }
 })
 
 module.exports = router;
