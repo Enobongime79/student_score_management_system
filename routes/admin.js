@@ -2,7 +2,11 @@ var express = require('express');
 var router = express.Router();
 const bcrypt = require("bcrypt");
 const saltRounds = 10;
-const { supabase } = require('../config/supabaseClient');
+const db = require('../db/database');
+
+const allAsync = (query, params = []) => new Promise((resolve, reject) => db.all(query, params, (err, rows) => err ? reject(err) : resolve(rows)));
+const getAsync = (query, params = []) => new Promise((resolve, reject) => db.get(query, params, (err, row) => err ? reject(err) : resolve(row)));
+const runAsync = (query, params = []) => new Promise((resolve, reject) => db.run(query, params, function(err) { err ? reject(err) : resolve(this) }));
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
@@ -20,26 +24,31 @@ router.get("/manage_teachers", async(req, res) => {
   }
 
   else{
-    const { data: rows, error } = await supabase
-      .from('teachers')
-      .select(`
-        *,
-        staff (*)
-      `);
+    try {
+        const rows = await allAsync(`
+            SELECT t.*, s.name as staff_name, s.email as staff_email, s.role as staff_role
+            FROM teachers t
+            JOIN staff s ON t.teacher_id = s.id
+        `);
 
-    if (error) {
-      console.log(error.message);
-      return res.status(500).send("Error fetching teachers");
-    } else {
-      rows.forEach(teacher => {
-        teacher.real_id = 'TEA_' + teacher.id;
-        teacher.grade = "Grade " + teacher.class;
-      });
+        rows.forEach(teacher => {
+          teacher.staff = {
+              id: teacher.teacher_id,
+              name: teacher.staff_name,
+              email: teacher.staff_email,
+              role: teacher.staff_role
+          };
+          teacher.real_id = 'TEA_' + teacher.id;
+          teacher.grade = "Grade " + teacher.class;
+        });
 
-      return res.render('admin_manageTeachers', {
-        title: 'Teacher Manager',
-        teachers: rows
-      });
+        return res.render('admin_manageTeachers', {
+          title: 'Teacher Manager',
+          teachers: rows
+        });
+    } catch(error) {
+        console.log(error.message);
+        return res.status(500).send("Error fetching teachers");
     }
   }
 });
@@ -57,29 +66,12 @@ router.post("/manage_teachers/add_teachers", async (req, res) => {
     try {
         const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-        // Insert into staff table
-        const { data: staffData, error: staffError } = await supabase
-            .from('staff')
-            .insert([{ name, email, password: hashedPassword, role }])
-            .select()
-            .single();
+        const staffResult = await runAsync('INSERT INTO staff (name, email, password, role) VALUES (?, ?, ?, ?)', 
+            [name, email, hashedPassword, role]);
+        const staffId = staffResult.lastID;
 
-        if (staffError) {
-            console.log(staffError.message);
-            return res.status(500).send("Error adding staff");
-        }
-
-        const staffId = staffData.id;
-
-        // Insert into teachers table
-        const { error: teacherError } = await supabase
-            .from('teachers')
-            .insert([{ name, class: grade, teacher_id: staffId }]);
-
-        if (teacherError) {
-            console.log(teacherError.message);
-            return res.status(500).send("Error adding teacher");
-        }
+        await runAsync('INSERT INTO teachers (name, class, teacher_id) VALUES (?, ?, ?)',
+            [name, grade, staffId]);
 
         console.log("Inserted Successfully!");
         return res.redirect('/admin/manage_teachers');
@@ -98,28 +90,25 @@ router.post("/manage_teachers/edit_teachers", async (req, res) => {
   else{
     const { id } = req.body;
     
-    const { data: row, error } = await supabase
-        .from('teachers')
-        .select(`
-            *,
-            staff (*)
-        `)
-        .eq('id', id)
-        .single();
+    try {
+        const row = await getAsync(`
+            SELECT t.*, s.name as staff_name, s.email, s.role, s.password
+            FROM teachers t
+            JOIN staff s ON t.teacher_id = s.id
+            WHERE t.id = ?
+        `, [id]);
 
-    if (error){
-        return res.status(500).json({ error: error.message})
-    }
-    else {
-        // Flatten the staff data for consistency with frontend expectations if needed
         const flatRow = {
             ...row,
-            ...row.staff,
-            id: row.id // keep teacher id as 'id'
+            name: row.staff_name || row.name, 
+            email: row.email,
+            id: row.id 
         };
         console.log("Successfully got the row");
         res.json(flatRow);
         console.log(flatRow);
+    } catch(error) {
+        return res.status(500).json({ error: error.message})
     }
   }
 })
@@ -133,31 +122,10 @@ router.post("/manage_teachers/save_details", async (req, res) => {
     const { editFullName, editGrade, editEmail, real_id } = req.body;
 
     try {
-        // Update teachers table
-        const { data: teacher, error: teacherError } = await supabase
-            .from('teachers')
-            .update({ name: editFullName, class: editGrade })
-            .eq('id', real_id)
-            .select('teacher_id')
-            .single();
-
-        if (teacherError){
-          console.log(teacherError.message);
-          return res.send("Error updating teacher!")
-        }
-
-        const staffId = teacher.teacher_id;
-
-        // Update staff table
-        const { error: staffError } = await supabase
-            .from('staff')
-            .update({ name: editFullName, email: editEmail })
-            .eq('id', staffId);
-
-        if (staffError){
-            console.log(staffError.message);
-            return res.send("Error updating staff!")
-        }
+        await runAsync('UPDATE teachers SET name = ?, class = ? WHERE id = ?', [editFullName, editGrade, real_id]);
+        const teacher = await getAsync('SELECT teacher_id FROM teachers WHERE id = ?', [real_id]);
+        
+        await runAsync('UPDATE staff SET name = ?, email = ? WHERE id = ?', [editFullName, editEmail, teacher.teacher_id]);
         
         console.log("Updated the teachers details in the staff table!");
         return res.redirect("/admin/manage_teachers")
@@ -177,38 +145,16 @@ router.post("/manage_teachers/delete_teachers", async (req, res) => {
     const { id } = req.body;
 
     try {
-        // Get teacher_id first
-        const { data: teacher, error: fetchError } = await supabase
-            .from('teachers')
-            .select('teacher_id')
-            .eq('id', id)
-            .single();
+        const teacher = await getAsync('SELECT teacher_id FROM teachers WHERE id = ?', [id]);
 
-        if (fetchError || !teacher){
+        if (!teacher){
             return console.log(`Row with id:${id} does not exist in the database!`)
         }
 
         const staffId = teacher.teacher_id;
 
-        // Delete from teachers
-        const { error: deleteTeacherError } = await supabase
-            .from('teachers')
-            .delete()
-            .eq('id', id);
-
-        if (deleteTeacherError){
-          return console.error(deleteTeacherError.message);
-        }
-
-        // Delete from staff
-        const { error: deleteStaffError } = await supabase
-            .from('staff')
-            .delete()
-            .eq('id', staffId);
-
-        if (deleteStaffError){
-            return console.log(deleteStaffError.message)
-        }
+        await runAsync('DELETE FROM teachers WHERE id = ?', [id]);
+        await runAsync('DELETE FROM staff WHERE id = ?', [staffId]);
         
         console.log("Successfully deleted from the staff table!")
         return res.redirect('/admin/manage_teachers')
@@ -225,24 +171,22 @@ router.get('/manage_students', async (req, res, next) => {
   }
 
   else{
-    const { data: rows, error } = await supabase
-        .from('users')
-        .select('*');
+    try {
+        const rows = await allAsync('SELECT * FROM users');
+        
+        console.log(rows);
 
-    if (error){
+        rows.forEach(student => {
+            student.average = ((student.math + student.english + student.science) / 3).toFixed(2);
+            student.real_id = 'STU_' + student.id;
+            student.total = (student.math + student.english + student.science);
+        });
+
+        res.render('admin_student', { title: 'Student Score Management System', students: rows });
+    } catch(error) {
         console.log(error.message)
         return res.status(500).send("Error fetching students");
     }
-    
-    console.log(rows);
-
-    rows.forEach(student => {
-        student.average = ((student.math + student.english + student.science) / 3).toFixed(2);
-        student.real_id = 'STU_' + student.id;
-        student.total = (student.math + student.english + student.science);
-    });
-
-    res.render('admin_student', { title: 'Student Score Management System', students: rows });
   };
 });
 
@@ -254,23 +198,16 @@ router.post('/manage_students/add_student', async(req, res) => {
   else{
     const { fullName, grade, mathScore, englishScore, scienceScore} = req.body;
 
-    const { data, error } = await supabase
-    .from('users')
-    .insert([{
-      name: fullName,
-      class: `Grade ${grade}`,
-      math: mathScore,
-      english: englishScore,
-      science: scienceScore
-    }]);
-
-    if (error) {
-      console.error(error);
-      return res.status(500).send("Error adding student");
+    try {
+        await runAsync('INSERT INTO users (name, class, math, english, science) VALUES (?, ?, ?, ?, ?)', 
+            [fullName, `Grade ${grade}`, mathScore, englishScore, scienceScore]);
+        
+        console.log("Inserted Student")
+        return res.redirect("/admin/manage_students");
+    } catch (error) {
+        console.error(error);
+        return res.status(500).send("Error adding student");
     }
-    
-    console.log("Inserted Student:", data)
-    return res.redirect("/admin/manage_students");
   };
 });
 
@@ -282,17 +219,12 @@ router.post("/manage_students/delete_student", async (req, res) => {
   else{
     const { id } = req.body;
     
-    const { error } = await supabase
-        .from('users')
-        .delete()
-        .eq('id', id);
-
-    if (error){
-        console.error(error.message);
-    }
-    else {
+    try {
+        await runAsync('DELETE FROM users WHERE id = ?', [id]);
         console.log(id)
         console.log("Deleted Successfully")
+    } catch(error) {
+        console.error(error.message);
     }
     
     res.redirect('/admin/manage_students');
@@ -307,18 +239,12 @@ router.post("/manage_students/edit_student", async (req, res) => {
   else{
     const { id } = req.body;
     
-    const { data: result, error } = await supabase
-        .from('users')
-        .select('id, name, class, math, english, science')
-        .eq('id', id)
-        .single();
-
-    if (error){
-        res.status(500).json({ error: error.message})
-    }
-    else {
+    try {
+        const result = await getAsync('SELECT id, name, class, math, english, science FROM users WHERE id = ?', [id]);
         res.json(result);
         console.log(result);
+    } catch(error) {
+        res.status(500).json({ error: error.message})
     }
   };
 })
@@ -332,24 +258,14 @@ router.post("/manage_students/save_details", async (req, res) => {
     const { fullName, grade, mathScore, englishScore, scienceScore, real_id } = req.body;
     const realGrade = grade.startsWith("Grade ") ? grade : "Grade " + grade;
 
-    const { error } = await supabase
-        .from('users')
-        .update({
-            name: fullName,
-            class: realGrade,
-            math: mathScore,
-            english: englishScore,
-            science: scienceScore
-        })
-        .eq('id', real_id);
-
-    if (error){
+    try {
+        await runAsync('UPDATE users SET name = ?, class = ?, math = ?, english = ?, science = ? WHERE id = ?',
+            [fullName, realGrade, mathScore, englishScore, scienceScore, real_id]);
+        console.log("Updated successfully");
+        res.redirect('/admin/manage_students') 
+    } catch(error) {
         console.log(error.message);
         return res.status(500).send("Error saving student details");
-    }
-    else{
-        console.log("Updated successfully");
-        res.redirect('/admin/manage_students') // Fixed redirect path based on routine
     }
   };
 })
